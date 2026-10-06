@@ -26,7 +26,7 @@
 
 # Results
 
-Mean ± std over 3 random splits of this PyTorch implementation.
+Mean ± std (population std) over 3 random splits of this PyTorch implementation.
 
 | Dataset | Bands | OA | AA | Kappa |
 |---|---|---|---|---|
@@ -35,6 +35,8 @@ Mean ± std over 3 random splits of this PyTorch implementation.
 | University of Houston | 40 / 144 | 98.97 ± 0.25 | 99.04 ± 0.30 | 98.89 ± 0.27 |
 
 ![oa](results/figs/oa_comparison.png)
+
+As in Sec. 4.3 of the paper, each compared method is evaluated with its own classifier (RBF-SVM on pixels for BS-Nets, ABCNN, MR-SVM and DDCNN; a 15 × 15 2D CNN for TWCNN, SICNN and DRLBS), while MH-DRL uses an ensemble of 4 PE-Nets with test-time flips. The comparison is therefore between complete pipelines; any method's bands can be fed to the same ensemble with `python -m mhdrl.boost --json runs/<ds>/<method>/seed<k>.json --members ...`.
 
 Per-class accuracies: [results/main_table.md](results/main_table.md) · Selected bands: [results/selected_bands.json](results/selected_bands.json)
 
@@ -52,7 +54,7 @@ Per-class accuracies: [results/main_table.md](results/main_table.md) · Selected
 
 # Usage
 
-Requires a CUDA GPU.
+Requires a CUDA GPU. Tested with Python 3.10, PyTorch 2.5.1, NumPy 1.26.4, SciPy 1.15.3 and scikit-learn 1.7.2.
 
 ```bash
 pip install -r requirements.txt

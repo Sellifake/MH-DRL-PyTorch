@@ -24,6 +24,7 @@ def svm_eval(cube, bands, tr, ytr, te, yte, n_cls, seed):
 def cnn2d_eval(cube, bands, tr, ytr, te, yte, n_cls, seed, patch=15, epochs=200, bs=64, lr=1e-3, device='cuda'):
     import torch.nn.functional as F
     torch.manual_seed(seed)
+    np.random.seed(seed)
     sampler = PatchSampler(cube[:, :, bands], patch, device)
     net = CNN2D(len(bands), n_cls).to(device)
     opt = torch.optim.AdamW(net.parameters(), lr=lr, weight_decay=1e-4)

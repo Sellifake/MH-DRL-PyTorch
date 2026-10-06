@@ -31,10 +31,14 @@ def load_members(wdir, n_bands, n_cls, device='cuda'):
     return cfg, members
 
 
-def ensemble_prob(cube_sel, members, coords):
+def ensemble_prob(cube_sel, members, coords, chunk=20000):
+    """各成员 8 向 TTA 的 softmax 之和；每个成员的整幅图只上传一次 GPU，坐标分块推理。"""
     prob = 0
     for net, patch in members:
-        prob = prob + predict(net, PatchSampler(cube_sel, patch), coords, True)
+        sampler = PatchSampler(cube_sel, patch)
+        prob = prob + np.concatenate([predict(net, sampler, coords[i:i + chunk], True)
+                                      for i in range(0, len(coords), chunk)])
+        del sampler
     return prob
 
 
@@ -46,9 +50,8 @@ def main():
     a = ap.parse_args()
     torch.backends.cudnn.benchmark = True
     cube, gt, n_cls = load(a.ds)
-    cfg = json.load(open(os.path.join(a.weights, 'ensemble.json')))
-    bands = np.asarray(cfg['bands'])
-    _, members = load_members(a.weights, len(bands), n_cls)
+    bands = np.asarray(json.load(open(os.path.join(a.weights, 'ensemble.json')))['bands'])
+    cfg, members = load_members(a.weights, len(bands), n_cls)
     tr, ytr, te, yte = split(gt, DATASETS[a.ds]['ratio'], cfg['seed'])
     sub = cube[:, :, bands]
     m = metrics(yte, ensemble_prob(sub, members, te).argmax(1), n_cls)
@@ -58,8 +61,7 @@ def main():
         from PIL import Image
         H, W = gt.shape
         coords = np.argwhere(np.ones((H, W), bool))
-        pred = np.concatenate([ensemble_prob(sub, members, coords[i:i + 20000]).argmax(1)
-                               for i in range(0, len(coords), 20000)]).reshape(H, W) + 1
+        pred = ensemble_prob(sub, members, coords).argmax(1).reshape(H, W) + 1
         Image.fromarray(PALETTE[pred % len(PALETTE)]).save(a.map.replace('.png', '_full.png'))
         Image.fromarray(PALETTE[np.where(gt > 0, pred, 0) % len(PALETTE)]).save(a.map)
         Image.fromarray(PALETTE[gt % len(PALETTE)]).save(a.map.replace('.png', '_gt.png'))

@@ -72,6 +72,7 @@ class TWNet(nn.Module):
 def twcnn_scores(cube, tr, ytr, n_cls, k, seed, patch=15, iters=3000, bs=64, lr=1e-3, lam=0.01,
                  band_loss=True, device='cuda'):
     torch.manual_seed(seed)
+    np.random.seed(seed)
     D = cube.shape[2]
     x = PatchSampler(cube, patch, device)(tr)
     y = torch.as_tensor(ytr, device=device)

@@ -61,6 +61,7 @@ class MaskedEvaluator:
         self.nets = []
         for k in range(folds):
             torch.manual_seed(seed * 100 + k)
+            np.random.seed(seed * 100 + k)
             net = (PENet(self.D, n_cls, patch, norm=norm) if arch == 'penet' else CNN2D(self.D, n_cls)).to(device)
             ck = cache and f'{cache}_fold{k}.pt'
             if ck and os.path.exists(ck):

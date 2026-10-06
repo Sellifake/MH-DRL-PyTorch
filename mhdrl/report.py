@@ -33,12 +33,12 @@ def main():
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     seeds = [int(s) for s in a.seeds.split(',')]
-    md = [f'Mean ± std over {len(seeds)} random splits (seeds {a.seeds}).\n']
+    md = [f'Mean ± std over {len(seeds)} random splits (seeds {a.seeds}); std is the population std (ddof=0).\n']
     bands_out = {}
     for ds in a.datasets.split(','):
         res = {n: [load_metrics(ds, k, s, a.mh_tag) for s in seeds] for k, n in NAMES}
         names = [n for _, n in NAMES]
-        md.append(f'### {TITLE[ds]}\n')
+        md.append(f'### {TITLE.get(ds, ds)}\n')
         md.append('| Class | ' + ' | '.join(names) + ' |')
         md.append('|---|' + '---|' * len(names))
         n_cls = len(res[names[0]][0][0]['per_class'])

@@ -1,4 +1,4 @@
-Mean ± std over 3 random splits (seeds 0,1,2).
+Mean ± std over 3 random splits (seeds 0,1,2); std is the population std (ddof=0).
 
 ### Indian Pines (60 bands)
 

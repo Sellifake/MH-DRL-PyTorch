@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from scipy.spatial.distance import cdist
 from sklearn.feature_selection import RFE
 from sklearn.svm import LinearSVC
 
@@ -158,7 +159,7 @@ def ddcnn_bands(cube, tr, ytr, n_cls, nd, seed, n_cand=60, log=print, device='cu
     rng = np.random.RandomState(seed)
     D = cube.shape[2]
     px = cube.reshape(-1, D)[rng.permutation(cube.shape[0] * cube.shape[1])[:20000]].T   # [D, P]
-    dist = np.sqrt(((px[:, None] - px[None]) ** 2).mean(2))
+    dist = cdist(px, px) / np.sqrt(px.shape[1])          # 波段间逐像素差的均方根
     dc = np.sort(dist[np.triu_indices(D, 1)])[int(0.02 * D * (D - 1) / 2)]
     rho = np.exp(-(dist / dc) ** 2).sum(1) - 1
     delta = np.zeros(D)

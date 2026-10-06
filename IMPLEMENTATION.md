@@ -40,6 +40,10 @@ This repository is a PyTorch re-implementation (2026) of MH-DRL. It follows the 
 | TWCNN threshold | 0.1 (Sec. 4.2) | 0.5, as in the group's TWCNN code | — |
 | CNNeGA, RLFSR-Net | compared | not included | no public code |
 
+## Reproducibility
+
+The data split depends only on `--seed`. All random number generators used by a run (PyTorch and NumPy) are seeded from `--seed`, but cuDNN autotuning and GPU atomics are not bit-deterministic, so re-running the band search can give slightly different bands and accuracies. The released weights reproduce the reported numbers exactly with `mhdrl.infer`.
+
 ## Requirements
 
 A CUDA GPU is required.

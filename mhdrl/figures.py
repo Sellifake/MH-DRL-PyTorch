@@ -54,7 +54,7 @@ def fig_oa(datasets, seeds, mh_tag, out):
             t.set_fontweight('bold' if t.get_text() == 'MH-DRL' else 'normal')
         ax.set_xlim(lo, 100.5)
         ax.set_xlabel(f'Overall accuracy (%), mean ± std of {len(seeds)} splits')
-        ax.set_title(TITLE[ds], color=INK, fontsize=11, loc='left')
+        ax.set_title(TITLE.get(ds, ds), color=INK, fontsize=11, loc='left')
         ax.grid(axis='x', color=GRID, lw=0.8)
         ax.set_axisbelow(True)
     fig.tight_layout()
@@ -90,7 +90,7 @@ def fig_search(ds, seed, mh_tag, out):
         end = max(b for _, b in spans.values())
         axes[0].text((end + len(R)) / 2, top, 'self-exploration (DQN)', ha='center', va='top', fontsize=9, color=MUTED)
     axes[1].set_xlabel('Step')
-    axes[0].set_title(f'MH-DRL band search on {TITLE[ds]}, split seed {seed} (teacher-guided stages shaded)',
+    axes[0].set_title(f'MH-DRL band search on {TITLE.get(ds, ds)}, split seed {seed} (teacher-guided stages shaded)',
                       color=INK, fontsize=11, loc='left')
     fig.tight_layout()
     fig.savefig(os.path.join(out, f'search_{ds}.png'))
@@ -118,7 +118,7 @@ def fig_bands(picks, mh_tag, out):
         ax.scatter(bands, ie[bands], s=36, color=BLUE, zorder=3, edgecolor='white', linewidth=1.5)
         ax.set_xlim(-1, len(ie))
         ax.set_ylabel('Entropy')
-        ax.set_title(f'{TITLE[ds]}: {len(bands)} of {len(ie)} bands selected by MH-DRL (split seed {seed})', color=INK,
+        ax.set_title(f'{TITLE.get(ds, ds)}: {len(bands)} of {len(ie)} bands selected by MH-DRL (split seed {seed})', color=INK,
                      fontsize=10, loc='left')
         ax.grid(axis='y', color=GRID, lw=0.8)
         ax.set_axisbelow(True)
@@ -148,7 +148,7 @@ def fig_maps(picks, maps_dir, out):
             for s in ax.spines.values():
                 s.set_visible(False)
             if i == 0:
-                ax.set_title({'indian': 'Indian Pines', 'paviau': 'Pavia U.', 'houston': 'Houston'}[ds], color=INK,
+                ax.set_title({'indian': 'Indian Pines', 'paviau': 'Pavia U.', 'houston': 'Houston'}.get(ds, ds), color=INK,
                              fontsize=10)
             if j == 0:
                 ax.set_ylabel(lab, color=INK)

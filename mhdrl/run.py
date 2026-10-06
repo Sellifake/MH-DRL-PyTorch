@@ -48,6 +48,7 @@ def main():
     ap.add_argument('--cls_pca', type=int, default=0)
     ap.add_argument('--cls_epochs', type=int, default=200)
     ap.add_argument('--cls_ens', type=int, default=3)
+    ap.add_argument('--no_eval', action='store_true', help='只选波段不评测（MH-DRL 的最终评测交给 mhdrl.boost）')
     # MH-DRL
     ap.add_argument('--pe_patch', type=int, default=15)
     ap.add_argument('--pe_iters', type=int, default=2000)
@@ -123,12 +124,15 @@ def main():
     sel_time = time.time() - t0
     log(f'selected {len(bands)} bands in {sel_time:.0f}s: {bands.tolist()}')
 
-    if a.method in ('mhdrl', 'all'):
+    if a.no_eval:
+        m = None
+    elif a.method in ('mhdrl', 'all'):
         m, _, _ = train_eval(cube, n_cls, bands, tr, ytr, te, yte, a.seed, a.cls, a.cls_patch, a.cls_pca,
                              a.cls_epochs, ens=a.cls_ens)
     else:
         m = own_eval(a.method, cube, np.asarray(bands), tr, ytr, te, yte, n_cls, a.seed)
-    log(f'RESULT OA={m["oa"] * 100:.2f} AA={m["aa"] * 100:.2f} Kappa={m["kappa"] * 100:.2f}')
+    if m:
+        log(f'RESULT OA={m["oa"] * 100:.2f} AA={m["aa"] * 100:.2f} Kappa={m["kappa"] * 100:.2f}')
     json.dump(dict(args=vars(a), bands=np.asarray(bands).tolist(), select_time_s=sel_time, metrics=m, **extra),
               open(out, 'w'))
 
